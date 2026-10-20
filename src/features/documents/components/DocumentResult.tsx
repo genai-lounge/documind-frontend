@@ -1,10 +1,6 @@
-import type { DocumentResponse, DocumentSection } from "@/types/document";
+import { formatBytes } from "@/lib/format";
 
-export function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
+import type { DocumentResponse, DocumentSection } from "../types";
 
 function sectionLabel(section: DocumentSection): string {
   return section.page_number === null
@@ -12,7 +8,6 @@ function sectionLabel(section: DocumentSection): string {
     : `Page ${section.page_number}`;
 }
 
-/** Shows one extracted document: metadata, warnings, and text by page. */
 export function DocumentResult({ document }: { document: DocumentResponse }) {
   const totalChars = document.sections.reduce((n, s) => n + s.char_count, 0);
   const details: [string, string][] = [
