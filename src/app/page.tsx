@@ -1,4 +1,4 @@
-import { DocumentUpload } from "@/components/DocumentUpload";
+import { DocumentUpload } from "@/features/documents";
 
 export default function Home() {
   return (

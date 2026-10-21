@@ -2,16 +2,24 @@
 
 import { useRef, useState } from "react";
 
-import { DocumentResult, formatBytes } from "@/components/DocumentResult";
-import { ApiError, uploadDocument } from "@/lib/api";
-import type { DocumentResponse } from "@/types/document";
+import { formatBytes } from "@/lib/format";
+import { ApiError } from "@/lib/http";
 
-// One row in the session's upload list. Phase 1 keeps this list only in
-// browser memory, so it is cleared when the page is refreshed.
+import { uploadDocument } from "../api";
+import type { DocumentResponse } from "../types";
+import { DocumentResult } from "./DocumentResult";
+
 type UploadEntry =
   | { key: string; filename: string; size: number; state: "uploading" }
   | { key: string; filename: string; size: number; state: "done"; document: DocumentResponse }
-  | { key: string; filename: string; size: number; state: "failed"; error: string };
+  | {
+      key: string;
+      filename: string;
+      size: number;
+      state: "failed";
+      error: string;
+      requestId: string | null;
+    };
 
 const ACCEPTED_TYPES = ".pdf,.docx,.txt";
 
@@ -29,7 +37,6 @@ export function DocumentUpload() {
     if (!files || files.length === 0) return;
     setIsUploading(true);
 
-    // Upload one file at a time so the order in the list matches the results.
     for (const file of Array.from(files)) {
       const base = { key: String(nextKey.current++), filename: file.name, size: file.size };
       setEntries((current) => [{ ...base, state: "uploading" }, ...current]);
@@ -40,12 +47,12 @@ export function DocumentUpload() {
       } catch (err) {
         const message =
           err instanceof ApiError ? err.message : "Something went wrong while uploading.";
-        updateEntry(base.key, { ...base, state: "failed", error: message });
+        const requestId = err instanceof ApiError ? err.requestId : null;
+        updateEntry(base.key, { ...base, state: "failed", error: message, requestId });
       }
     }
 
     setIsUploading(false);
-    // Clear the input so selecting the same file again triggers a new upload.
     if (inputRef.current) inputRef.current.value = "";
   }
 
@@ -96,6 +103,11 @@ export function DocumentUpload() {
                   className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-900 dark:border-red-800 dark:bg-red-950 dark:text-red-200"
                 >
                   {entry.error}
+                  {entry.requestId && (
+                    <span className="mt-1 block font-mono text-xs opacity-70">
+                      Reference: {entry.requestId}
+                    </span>
+                  )}
                 </p>
               )}
               {entry.state === "done" && <DocumentResult document={entry.document} />}

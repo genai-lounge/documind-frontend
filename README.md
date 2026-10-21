@@ -2,11 +2,33 @@
 
 The Next.js frontend for DocuMind, an educational RAG (Retrieval-Augmented Generation) app: upload documents, ask questions, and get Claude-generated answers with source citations you can check. The FastAPI backend lives in a separate repository (`documind-backend`).
 
-**Current status: Phase 1 (document upload and text extraction).** You can upload PDF, DOCX, and TXT files and inspect the extracted text and metadata. Nothing is stored yet, and there's no chunking, embedding, vector-store, or Claude functionality. See [docs/architecture.md](docs/architecture.md) for the plan and [docs/documind_product_requirements_and_phases.md](docs/documind_product_requirements_and_phases.md) for the full spec.
+**Current status: Phase 1 (document upload and text extraction).** You can upload PDF, DOCX, and TXT files and inspect the extracted text and metadata. Nothing is stored yet, and there's no chunking, embedding, vector-store, or Claude functionality.
+
+- [docs/architecture.md](docs/architecture.md): how the whole system is designed
+- [docs/adr/](docs/adr/README.md): why it is designed that way (Architecture Decision Records)
+- [docs/documind_product_requirements_and_phases.md](docs/documind_product_requirements_and_phases.md): the full product spec
 
 ## Stack
 
 Next.js (App Router) + TypeScript + Tailwind CSS.
+
+## Structure
+
+```text
+src/
+├── app/                     Next.js routes (pages); they compose features
+├── features/
+│   └── documents/           one folder per feature
+│       ├── index.ts         public API: the only path other code may import from
+│       ├── api.ts           backend calls (through lib/http)
+│       ├── types.ts         API contract (mirrors the backend's app/api/v1/schemas.py)
+│       └── components/      DocumentUpload, DocumentResult
+└── lib/                     shared, feature-agnostic code
+    ├── http.ts              requestJson() and ApiError (code, status, requestId)
+    └── format.ts            display helpers
+```
+
+ESLint enforces the boundaries: other code imports a feature only through its `index.ts`, and `lib/` never imports features.
 
 ## Prerequisites
 
@@ -17,9 +39,13 @@ Next.js (App Router) + TypeScript + Tailwind CSS.
 ```bash
 npm install     # install dependencies
 npm run dev     # start the dev server at http://localhost:3008
-npm run lint    # ESLint
-npm run build   # production build (includes type checking)
+npm run check   # lint + type check; run before every commit
+npm run lint    # ESLint (including the architecture boundary rules)
+npm run typecheck  # TypeScript
+npm run build   # production build
 ```
+
+When a request fails, the error shows a **Reference** ID. The same ID appears in every backend log line for that request.
 
 The backend runs at http://localhost:8008.
 
