@@ -63,7 +63,7 @@ export function DocumentUpload() {
           {isUploading ? "Uploading…" : "Choose PDF, DOCX, or TXT files"}
         </span>
         <span className="text-sm text-zinc-500 dark:text-zinc-400">
-          Text is extracted on the server. Nothing is stored yet.
+          Text is extracted, chunked, and embedded on the server. Nothing is stored yet.
         </span>
         <input
           ref={inputRef}

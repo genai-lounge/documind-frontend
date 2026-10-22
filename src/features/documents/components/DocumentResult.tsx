@@ -1,6 +1,13 @@
+"use client";
+
+import { useState } from "react";
+
 import { formatBytes } from "@/lib/format";
 
 import type { DocumentResponse, DocumentSection } from "../types";
+import { ChunkList } from "./ChunkList";
+
+type View = "pages" | "chunks";
 
 function sectionLabel(section: DocumentSection): string {
   return section.page_number === null
@@ -9,6 +16,7 @@ function sectionLabel(section: DocumentSection): string {
 }
 
 export function DocumentResult({ document }: { document: DocumentResponse }) {
+  const [view, setView] = useState<View>("pages");
   const totalChars = document.sections.reduce((n, s) => n + s.char_count, 0);
   const details: [string, string][] = [
     ["Type", document.file_type.toUpperCase()],
@@ -21,6 +29,13 @@ export function DocumentResult({ document }: { document: DocumentResponse }) {
   if (document.metadata.title) details.push(["Title", document.metadata.title]);
   if (document.metadata.author) {
     details.push(["Author", document.metadata.author]);
+  }
+  details.push(["Chunks", document.chunks.length.toLocaleString()]);
+  if (document.embedding) {
+    details.push([
+      "Embedding",
+      `${document.embedding.model} (${document.embedding.dimensions.toLocaleString()} dimensions)`,
+    ]);
   }
 
   return (
@@ -42,8 +57,47 @@ export function DocumentResult({ document }: { document: DocumentResponse }) {
         </ul>
       )}
 
-      <div className="flex flex-col gap-2">
-        {document.sections.map((section, index) => (
+      <div
+        role="tablist"
+        aria-label="View"
+        className="flex w-fit gap-1 rounded-md bg-zinc-100 p-1 text-sm dark:bg-zinc-900"
+      >
+        {(
+          [
+            ["pages", `Pages (${document.sections.length})`],
+            ["chunks", `Chunks (${document.chunks.length})`],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            role="tab"
+            aria-selected={view === value}
+            onClick={() => setView(value)}
+            className={`rounded px-3 py-1 ${
+              view === value
+                ? "bg-white font-medium shadow-sm dark:bg-zinc-700"
+                : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {view === "chunks" ? (
+        <ChunkList chunks={document.chunks} embedding={document.embedding} />
+      ) : (
+        <SectionList sections={document.sections} />
+      )}
+    </div>
+  );
+}
+
+function SectionList({ sections }: { sections: DocumentSection[] }) {
+  return (
+    <div className="flex flex-col gap-2">
+        {sections.map((section, index) => (
           <details
             key={index}
             open={index === 0}
@@ -67,6 +121,5 @@ export function DocumentResult({ document }: { document: DocumentResponse }) {
           </details>
         ))}
       </div>
-    </div>
   );
 }

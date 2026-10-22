@@ -2,7 +2,7 @@
 
 The Next.js frontend for DocuMind, an educational RAG (Retrieval-Augmented Generation) app: upload documents, ask questions, and get Claude-generated answers with source citations you can check. The FastAPI backend lives in a separate repository (`documind-backend`).
 
-**Current status: Phase 1 (document upload and text extraction).** You can upload PDF, DOCX, and TXT files and inspect the extracted text and metadata. Nothing is stored yet, and there's no chunking, embedding, vector-store, or Claude functionality.
+**Current status: Phase 2 (chunking and embeddings).** Upload PDF, DOCX, or TXT files to see their text by page, or switch to **Chunks** to see how the backend split it (with the overlap between chunks faded) and a preview of each chunk's embedding vector. The **Similarity playground** shows how close in meaning the embedding model thinks two texts are. Nothing is stored yet, and there's no search or Claude functionality.
 
 - [docs/architecture.md](docs/architecture.md): how the whole system is designed
 - [docs/adr/](docs/adr/README.md): why it is designed that way (Architecture Decision Records)
@@ -18,11 +18,14 @@ Next.js (App Router) + TypeScript + Tailwind CSS.
 src/
 ├── app/                     Next.js routes (pages); they compose features
 ├── features/
-│   └── documents/           one folder per feature
-│       ├── index.ts         public API: the only path other code may import from
-│       ├── api.ts           backend calls (through lib/http)
-│       ├── types.ts         API contract (mirrors the backend's app/api/v1/schemas.py)
-│       └── components/      DocumentUpload, DocumentResult
+│   ├── documents/           one folder per feature
+│   │   ├── index.ts         public API: the only path other code may import from
+│   │   ├── api.ts           backend calls (through lib/http)
+│   │   ├── types.ts         API contract (mirrors the backend's app/api/v1/schemas.py)
+│   │   └── components/      DocumentUpload, DocumentResult, ChunkList
+│   └── similarity/          the similarity playground
+│       ├── index.ts, api.ts, types.ts
+│       └── components/      SimilarityPlayground
 └── lib/                     shared, feature-agnostic code
     ├── http.ts              requestJson() and ApiError (code, status, requestId)
     └── format.ts            display helpers
@@ -67,7 +70,7 @@ The backend runs at http://localhost:8008.
 
 To override it, copy `.env.example` to `.env.local` (Next.js loads it automatically) and restart `npm run dev`. Never commit real `.env` files, and never put secrets (such as the Anthropic API key) in `NEXT_PUBLIC_*` variables: those are visible to anyone using the site.
 
-## Known limitations (Phase 1)
+## Known limitations (Phase 2)
 
 - The document list lives in the browser and clears on page refresh; nothing is stored on the server.
 - The app only works when opened at `http://localhost:3008`. Opening it at the network address (`http://192.168.x.x:3008`) is blocked by CORS unless the backend adds that origin to `CORS_ALLOWED_ORIGINS`.
