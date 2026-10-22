@@ -45,6 +45,14 @@ npm run typecheck  # TypeScript
 npm run build   # production build
 ```
 
+Node.js version: `.nvmrc` pins it; run `nvm use` in this folder.
+
+## Continuous integration
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every pull request and on every push to `main`: `npm ci`, then `npm run lint`, `npm run typecheck`, and `npm run build`. `typecheck` runs `next typegen` first, so it works from a fresh clone, where `.next/` doesn't exist yet. See [ADR 0008](docs/adr/0008-continuous-integration.md).
+
+To make a failing check **block merging**: on GitHub, open the repository's **Settings → Branches → Add branch protection rule** (or **Rules → Rulesets**) for `main`, enable **Require status checks to pass before merging**, and select **Lint, types, build**.
+
 When a request fails, the error shows a **Reference** ID. The same ID appears in every backend log line for that request.
 
 The backend runs at http://localhost:8008.
