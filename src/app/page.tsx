@@ -1,4 +1,5 @@
-import { DocumentUpload } from "@/features/documents";
+import { DocumentLibrary } from "@/features/documents";
+import { SearchInspector } from "@/features/retrieval";
 import { SimilarityPlayground } from "@/features/similarity";
 
 export default function Home() {
@@ -7,7 +8,7 @@ export default function Home() {
       <header className="flex flex-col gap-2">
         <h1 className="text-3xl font-semibold tracking-tight">DocuMind</h1>
         <p className="text-zinc-600 dark:text-zinc-400">
-          Upload a document to see its text split into chunks and turned into embeddings.
+          Upload documents, then search them by meaning and inspect which passages match.
         </p>
       </header>
 
@@ -15,7 +16,19 @@ export default function Home() {
         <h2 id="documents-heading" className="text-xl font-semibold">
           Documents
         </h2>
-        <DocumentUpload />
+        <DocumentLibrary />
+      </section>
+
+      <section className="flex flex-col gap-4" aria-labelledby="search-heading">
+        <div className="flex flex-col gap-1">
+          <h2 id="search-heading" className="text-xl font-semibold">
+            Search
+          </h2>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Find the stored passages closest in meaning to a question.
+          </p>
+        </div>
+        <SearchInspector />
       </section>
 
       <section className="flex flex-col gap-4" aria-labelledby="similarity-heading">

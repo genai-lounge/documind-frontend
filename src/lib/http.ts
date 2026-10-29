@@ -23,6 +23,16 @@ export class ApiError extends Error {
 }
 
 export async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await send(path, init);
+  return (await response.json()) as T;
+}
+
+/** For requests whose success reply has no body, e.g. DELETE (204 No Content). */
+export async function requestNoContent(path: string, init?: RequestInit): Promise<void> {
+  await send(path, init);
+}
+
+async function send(path: string, init?: RequestInit): Promise<Response> {
   let response: Response;
   try {
     response = await fetch(`${API_BASE_URL}${path}`, init);
@@ -37,7 +47,7 @@ export async function requestJson<T>(path: string, init?: RequestInit): Promise<
   if (!response.ok) {
     throw await toApiError(response);
   }
-  return (await response.json()) as T;
+  return response;
 }
 
 async function toApiError(response: Response): Promise<ApiError> {
