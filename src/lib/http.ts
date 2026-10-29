@@ -1,3 +1,5 @@
+import { parseSse, type SseMessage } from "./sse";
+
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8008";
 
@@ -32,11 +34,27 @@ export async function requestNoContent(path: string, init?: RequestInit): Promis
   await send(path, init);
 }
 
+export async function* requestStream(
+  path: string,
+  init?: RequestInit,
+): AsyncGenerator<SseMessage> {
+  const response = await send(path, init);
+  if (!response.body) {
+    throw new ApiError("The response had no body.", "unknown_error", response.status);
+  }
+  yield* parseSse(response.body);
+}
+
+export function isAbortError(err: unknown): boolean {
+  return err instanceof DOMException && err.name === "AbortError";
+}
+
 async function send(path: string, init?: RequestInit): Promise<Response> {
   let response: Response;
   try {
     response = await fetch(`${API_BASE_URL}${path}`, init);
-  } catch {
+  } catch (err) {
+    if (isAbortError(err)) throw err;
     throw new ApiError(
       `Could not reach the backend at ${API_BASE_URL}. Is it running?`,
       "network_error",
