@@ -1,7 +1,8 @@
 import { parseSse, type SseMessage } from "./sse";
 
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8008";
+export const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8008"
+).replace(/\/+$/, "");
 
 const REQUEST_ID_HEADER = "X-Request-ID";
 
