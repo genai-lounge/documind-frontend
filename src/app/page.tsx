@@ -1,3 +1,4 @@
+import { AskPanel } from "@/features/answers";
 import { DocumentLibrary } from "@/features/documents";
 import { SearchInspector } from "@/features/retrieval";
 import { SimilarityPlayground } from "@/features/similarity";
@@ -8,7 +9,7 @@ export default function Home() {
       <header className="flex flex-col gap-2">
         <h1 className="text-3xl font-semibold tracking-tight">DocuMind</h1>
         <p className="text-zinc-600 dark:text-zinc-400">
-          Upload documents, then search them by meaning and inspect which passages match.
+          Upload documents, then ask questions and get answers with citations you can check.
         </p>
       </header>
 
@@ -17,6 +18,18 @@ export default function Home() {
           Documents
         </h2>
         <DocumentLibrary />
+      </section>
+
+      <section className="flex flex-col gap-4" aria-labelledby="ask-heading">
+        <div className="flex flex-col gap-1">
+          <h2 id="ask-heading" className="text-xl font-semibold">
+            Ask
+          </h2>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Claude answers from your documents only, and cites the passages it used.
+          </p>
+        </div>
+        <AskPanel />
       </section>
 
       <section className="flex flex-col gap-4" aria-labelledby="search-heading">
