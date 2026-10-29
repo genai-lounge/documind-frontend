@@ -65,6 +65,15 @@ Node.js version: `.nvmrc` pins it; run `nvm use` in this folder.
 
 To make a failing check **block merging**: on GitHub, open the repository's **Settings → Branches → Add branch protection rule** (or **Rules → Rulesets**) for `main`, enable **Require status checks to pass before merging**, and select **Lint, types, build**.
 
+## Deploy to Vercel
+
+The frontend is a separate Vercel project from the backend. See [ADR 0017](docs/adr/0017-deploy-on-vercel.md). Every merge to `main` deploys to production automatically; other branches don't deploy (`vercel.json`).
+
+1. Deploy the backend first (see the backend README) and note its address, e.g. `https://documind-backend.vercel.app`.
+2. On [vercel.com](https://vercel.com): **Add New → Project** → import `documind-frontend`. Vercel detects Next.js; leave the build settings as they are.
+3. Add the environment variable `NEXT_PUBLIC_API_BASE_URL` = the backend's address (no trailing slash). It is built into the page, so **redeploy** after changing it.
+4. Deploy, then add the frontend's address (e.g. `https://documind-frontend.vercel.app`) to the backend's `CORS_ALLOWED_ORIGINS` and redeploy the backend. Until then, the browser blocks the frontend's requests.
+
 When a request fails, the error shows a **Reference** ID. The same ID appears in every backend log line for that request.
 
 The backend runs at http://localhost:8008.
