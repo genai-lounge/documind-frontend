@@ -62,9 +62,11 @@ export function ChunkList({
                 )}
                 {chunk.text.slice(overlap)}
               </p>
-              <code className="break-all text-xs text-zinc-500 dark:text-zinc-400">
-                {formatPreview(chunk.embedding_preview, embedding.dimensions)}
-              </code>
+              {chunk.embedding_preview && (
+                <code className="break-all text-xs text-zinc-500 dark:text-zinc-400">
+                  {formatPreview(chunk.embedding_preview, embedding.dimensions)}
+                </code>
+              )}
             </li>
           );
         })}

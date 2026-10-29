@@ -16,6 +16,8 @@ export interface EmbeddingInfo {
   dimensions: number;
 }
 
+export type IndexStatus = "processing" | "indexed" | "no_text" | "failed";
+
 export interface DocumentChunk {
   chunk_index: number;
   page_number: number | null;
@@ -23,7 +25,7 @@ export interface DocumentChunk {
   start_char: number;
   end_char: number;
   char_count: number;
-  embedding_preview: number[];
+  embedding_preview?: number[];
 }
 
 export interface DocumentResponse {
@@ -37,5 +39,25 @@ export interface DocumentResponse {
   sections: DocumentSection[];
   warnings: string[];
   embedding: EmbeddingInfo | null;
+  chunks: DocumentChunk[];
+  index_status: IndexStatus;
+  created_at: string;
+}
+
+export interface DocumentSummary {
+  id: string;
+  filename: string;
+  file_type: string;
+  size_bytes: number;
+  status: IndexStatus;
+  created_at: string;
+  page_count: number | null;
+  chunk_count: number;
+  embedding: EmbeddingInfo | null;
+  error_code: string | null;
+  searchable: boolean;
+}
+
+export interface DocumentDetail extends DocumentSummary {
   chunks: DocumentChunk[];
 }

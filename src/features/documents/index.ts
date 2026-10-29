@@ -1,2 +1,2 @@
-export { DocumentUpload } from "./components/DocumentUpload";
-export type { DocumentResponse } from "./types";
+export { DocumentLibrary } from "./components/DocumentLibrary";
+export type { DocumentResponse, DocumentSummary } from "./types";
