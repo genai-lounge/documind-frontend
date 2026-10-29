@@ -41,5 +41,8 @@ jobs:
       - name: Type check
         run: npm run typecheck
 
+      - name: Component and unit tests
+        run: npm run test
+
       - name: Production build
         run: npm run build
